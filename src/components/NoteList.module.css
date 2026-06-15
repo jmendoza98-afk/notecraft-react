@@ -11,12 +11,31 @@
   padding: 12px 16px;
   cursor: pointer;
   border-left: 2px solid transparent;
-  transition: all 0.12s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   margin-bottom: 2px;
+  animation: slideInLeft 0.2s ease forwards;
+  position: relative;
+  overflow: hidden;
 }
 
-.item:hover  { background: #1a1a1e; }
-.item.active { background: #1c1c22; border-left-color: #c8a96a; }
+.item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #c8a96a08, transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.item:hover { background: #1a1a1e; transform: translateX(2px); }
+.item:hover::after { opacity: 1; }
+.item.active {
+  background: #1c1c22;
+  border-left-color: #c8a96a;
+  transform: translateX(2px);
+}
+
+.item.active::after { opacity: 1; }
 
 .title {
   font-size: 13px;
@@ -26,7 +45,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: color 0.15s;
 }
+
+.item:hover .title,
+.item.active .title { color: #f0ede6; }
 
 .preview {
   font-size: 11px;
@@ -35,7 +58,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.5;
+  transition: color 0.15s;
 }
+
+.item:hover .preview { color: #666662; }
 
 .date {
   font-size: 10px;
