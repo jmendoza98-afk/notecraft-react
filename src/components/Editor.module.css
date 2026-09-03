@@ -5,15 +5,14 @@
   min-width: 0;
 }
 
-/* ── Toolbar ── */
 .toolbar {
-  border-bottom: 1px solid #1e1e22;
+  border-bottom: 1px solid var(--border-subtle);
   padding: 12px 24px;
   display: flex;
   align-items: center;
   gap: 6px;
-  background: #0f0f12;
-  transition: border-color 0.2s;
+  background: var(--bg-toolbar);
+  transition: background 0.3s ease;
 }
 
 .toolbarBtn {
@@ -22,52 +21,40 @@
   border-radius: 6px;
   padding: 5px 8px;
   cursor: pointer;
-  color: #666660;
+  color: var(--text-muted);
   font-size: 12px;
   font-family: 'DM Mono', monospace;
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: 500;
-  position: relative;
-  overflow: hidden;
-}
-
-.toolbarBtn::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: #c8a96a;
-  opacity: 0;
-  transition: opacity 0.15s;
-  border-radius: 6px;
 }
 
 .toolbarBtn:hover {
-  background: #1c1c20;
-  border-color: #2a2a2e;
-  color: #aaa;
+  background: var(--bg-input);
+  border-color: var(--border);
+  color: var(--text-muted);
   transform: translateY(-1px);
 }
 
 .toolbarBtn:active { transform: translateY(0); }
 
-.toolbarSep { width: 1px; height: 18px; background: #222226; margin: 0 4px; }
+.toolbarSep { width: 1px; height: 18px; background: var(--border-subtle); margin: 0 4px; }
 
 .toolbarRight { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 
 .wordcount {
   font-size: 11px;
-  color: #444440;
+  color: var(--text-muted);
   font-family: 'DM Mono', monospace;
   transition: color 0.3s;
 }
 
 .deleteBtn {
   background: none;
-  border: 1px solid #2a2a2e;
+  border: 1px solid var(--border);
   border-radius: 6px;
   padding: 4px 10px;
   cursor: pointer;
-  color: #664444;
+   color: #aa6666;
   font-size: 11px;
   font-family: 'Outfit', sans-serif;
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
@@ -80,7 +67,6 @@
   transform: translateY(-1px);
 }
 
-/* Save indicator */
 .saveIndicator {
   display: flex;
   align-items: center;
@@ -95,7 +81,6 @@
   animation: checkPop 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-/* ── Content ── */
 .content {
   flex: 1;
   display: flex;
@@ -103,15 +88,17 @@
   padding: 28px 36px;
   overflow-y: auto;
   animation: fadeIn 0.25s ease forwards;
+  background: var(--bg-app);
+  transition: background 0.3s ease;
 }
 
 .content::-webkit-scrollbar       { width: 3px; }
-.content::-webkit-scrollbar-thumb { background: #2a2a2e; border-radius: 3px; }
+.content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
 .titleInput {
   font-family: 'DM Serif Display', serif;
   font-size: 28px;
-  color: #f0ede6;
+  color: var(--text-primary);
   background: none;
   border: none;
   outline: none;
@@ -122,8 +109,7 @@
   transition: color 0.2s;
 }
 
-.titleInput::placeholder { color: #222220; }
-.titleInput:focus::placeholder { color: #333330; }
+.titleInput::placeholder { color: var(--text-ghost); }
 
 .metaRow {
   display: flex;
@@ -131,11 +117,10 @@
   gap: 12px;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #1a1a1e;
-  transition: border-color 0.2s;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
-.metaDate { font-size: 11px; color: #444440; font-family: 'DM Mono', monospace; }
+.metaDate { font-size: 11px; color: var(--text-faint); font-family: 'DM Mono', monospace; }
 
 .pills { display: flex; gap: 6px; flex-wrap: wrap; }
 
@@ -145,7 +130,7 @@
   border-radius: 20px;
   font-weight: 500;
   letter-spacing: 0.03em;
-  transition: transform 0.15s, opacity 0.15s;
+  transition: transform 0.15s;
   animation: fadeIn 0.2s ease forwards;
 }
 
@@ -160,7 +145,7 @@
   font-family: 'Outfit', sans-serif;
   font-size: 15px;
   line-height: 1.8;
-  color: #c0bdb4;
+  color: var(--text-secondary);
   background: none;
   border: none;
   outline: none;
@@ -172,11 +157,9 @@
   transition: color 0.2s;
 }
 
-.bodyInput::placeholder { color: #1e1e1c; }
-.bodyInput:focus { color: #ccc9c0; }
-.bodyInput:focus::placeholder { color: #2a2a28; }
+.bodyInput::placeholder { color: var(--text-ghost); }
+.bodyInput:focus { color: var(--text-primary); }
 
-/* ── Empty state ── */
 .emptyState {
   flex: 1;
   display: flex;
@@ -189,5 +172,5 @@
 }
 
 .emptyState svg { animation: float 3s ease-in-out infinite; }
-.emptyState p     { font-family: 'DM Serif Display', serif; font-size: 18px; color: #2a2a28; }
-.emptyState small { font-size: 12px; color: #222220; }
+.emptyState p     { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text-ghost); }
+.emptyState small { font-size: 12px; color: var(--text-ghost); }

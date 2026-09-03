@@ -1,12 +1,13 @@
 .app {
   font-family: 'Outfit', sans-serif;
-  background: #0e0e10;
-  color: #e8e6e0;
+  background: var(--bg-app);
+  color: var(--text-primary);
   height: 600px;
   width: 100%;
   max-width: 900px;
   display: flex;
   border-radius: 14px;
   overflow: hidden;
-  border: 1px solid #2a2a2e;
+  border: 1px solid var(--border);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }

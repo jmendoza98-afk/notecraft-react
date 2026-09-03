@@ -9,7 +9,10 @@ type Props = Pick<
   ReturnType<typeof useNotes>,
   'filteredNotes' | 'activeId' | 'filterTag' | 'searchQuery' |
   'setActiveId' | 'setFilterTag' | 'setSearchQuery' | 'createNote'
->
+> & {
+  theme: string
+  onToggleTheme: () => void
+}
 
 export function Sidebar({
   filteredNotes,
@@ -20,13 +23,18 @@ export function Sidebar({
   setFilterTag,
   setSearchQuery,
   createNote,
+  theme,
+  onToggleTheme,
 }: Props) {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.header}>
-        <div className={styles.logo}>
-          note<span>craft</span>
-        </div>
+      <div className={styles.logo}>
+        note<span>craft</span>
+      </div>
+      <button className={styles.themeBtn} onClick={onToggleTheme} title="Toggle theme">
+         {theme === 'dark' ? '☀️' : '🌙'}
+      </button>
       </div>
 
       <button className={styles.newBtn} onClick={createNote}>

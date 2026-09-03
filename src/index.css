@@ -4,8 +4,46 @@
   padding: 0;
 }
 
+/* dark theme — default */
+:root {
+  --bg-page:       #080809;
+  --bg-app:        #0e0e10;
+  --bg-sidebar:    #131315;
+  --bg-input:      #1c1c20;
+  --bg-toolbar:    #0f0f12;
+  --border:        #2a2a2e;
+  --border-subtle: #1e1e22;
+  --text-primary:  #f0ede6;
+  --text-secondary:#c0bdb4;
+  --text-muted:    #888882;
+  --text-faint:    #555552;
+  --text-ghost:    #333330;
+  --accent:        #c8a96a;
+  --accent-dim:    #c8a96a22;
+  --accent-border: #c8a96a55;
+}
+
+/* light theme */
+[data-theme="light"] {
+  --bg-page:       #f5f3ee;
+  --bg-app:        #ffffff;
+  --bg-sidebar:    #faf8f4;
+  --bg-input:      #f0ede8;
+  --bg-toolbar:    #f8f6f2;
+  --border:        #e0ddd8;
+  --border-subtle: #ebe8e2;
+  --text-primary:  #1a1814;
+  --text-secondary:#3a3630;
+  --text-muted:    #6a6660;
+  --text-faint:    #9a9890;
+  --text-ghost:    #c0bdb8;
+  --accent:        #b8924a;
+  --accent-dim:    #b8924a18;
+  --accent-border: #b8924a44;
+}
+
 body {
-  background: #080809;
+  background: var(--bg-page);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13,6 +51,7 @@ body {
   padding: 24px;
   font-family: 'Outfit', sans-serif;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.3s ease;
 }
 
 #root {
@@ -21,7 +60,6 @@ body {
   justify-content: center;
 }
 
-/* ── Global animation keyframes ── */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -48,7 +86,7 @@ body {
   50%       { transform: translateY(-8px); }
 }
 
-.animate-fadeIn    { animation: fadeIn 0.25s ease forwards; }
-.animate-slideIn   { animation: slideInLeft 0.2s ease forwards; }
-.animate-float     { animation: float 3s ease-in-out infinite; }
-.animate-pulse     { animation: pulse 2s ease-in-out infinite; }
+.animate-fadeIn  { animation: fadeIn 0.25s ease forwards; }
+.animate-slideIn { animation: slideInLeft 0.2s ease forwards; }
+.animate-float   { animation: float 3s ease-in-out infinite; }
+.animate-pulse   { animation: pulse 2s ease-in-out infinite; }
