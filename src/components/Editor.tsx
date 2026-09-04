@@ -3,7 +3,8 @@ import { Note, Tag } from '../types/Note'
 import { formatFullDate, countWords } from '../utils/format'
 import styles from './Editor.module.css'
 
-const TAG_PILL_CLASS: Record<Tag, string> = {
+// maps each tag to its pill style
+const tagStyles: Record<Tag, string> = {
   work:     styles.pillWork,
   personal: styles.pillPersonal,
   ideas:    styles.pillIdeas,
@@ -17,50 +18,55 @@ interface Props {
 }
 
 export function Editor({ note, onUpdate, onDelete }: Props) {
-  const titleRef  = useRef<HTMLInputElement>(null)
-  const bodyRef   = useRef<HTMLDivElement>(null)
-  const [saved, setSaved]             = useState(false)
-  const [isBold, setIsBold]           = useState(false)
-  const [isItalic, setIsItalic]       = useState(false)
-  const [isUnderline, setIsUnderline] = useState(false)
-  const [isStrike, setIsStrike]       = useState(false)
+  const titleRef = useRef<HTMLInputElement>(null)
+  const bodyRef  = useRef<HTMLDivElement>(null)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  const [saved, setSaved]       = useState(false)
+  const [isBold, setIsBold]     = useState(false)
+  const [isItalic, setIsItalic] = useState(false)
+  const [isUnderline, setIsUnderline] = useState(false)
+  const [isStrike, setIsStrike] = useState(false)
+
+  // focus the title when a brand new note opens
   useEffect(() => {
     if (note && !note.title) titleRef.current?.focus()
   }, [note?.id])
 
+  // sync the contenteditable div when switching notes
   useEffect(() => {
-    if (bodyRef.current && note) {
-      if (bodyRef.current.innerHTML !== note.body) {
-        bodyRef.current.innerHTML = note.body || ''
-      }
-      const range = document.createRange()
-      const sel   = window.getSelection()
-      range.selectNodeContents(bodyRef.current)
-      range.collapse(false)
-      sel?.removeAllRanges()
-      sel?.addRange(range)
+    if (!bodyRef.current || !note) return
+    if (bodyRef.current.innerHTML !== note.body) {
+      bodyRef.current.innerHTML = note.body || ''
     }
+    // put cursor at the end
+    const range = document.createRange()
+    const sel = window.getSelection()
+    range.selectNodeContents(bodyRef.current)
+    range.collapse(false)
+    sel?.removeAllRanges()
+    sel?.addRange(range)
   }, [note?.id])
+
+  function scheduleSave() {
+    setSaved(false)
+    if (saveTimer.current) clearTimeout(saveTimer.current)
+    saveTimer.current = setTimeout(() => setSaved(true), 800)
+  }
 
   function handleBodyInput() {
     if (!note || !bodyRef.current) return
     onUpdate(note.id, { body: bodyRef.current.innerHTML })
-    setSaved(false)
-    if (saveTimer.current) clearTimeout(saveTimer.current)
-    saveTimer.current = setTimeout(() => setSaved(true), 800)
+    scheduleSave()
   }
 
-  function handleUpdate(changes: Partial<Pick<Note, 'title' | 'body'>>) {
+  function handleTitleChange(title: string) {
     if (!note) return
-    onUpdate(note.id, changes)
-    setSaved(false)
-    if (saveTimer.current) clearTimeout(saveTimer.current)
-    saveTimer.current = setTimeout(() => setSaved(true), 800)
+    onUpdate(note.id, { title })
+    scheduleSave()
   }
 
-  function updateFormatState() {
+  function checkFormatState() {
     setIsBold(document.queryCommandState('bold'))
     setIsItalic(document.queryCommandState('italic'))
     setIsUnderline(document.queryCommandState('underline'))
@@ -70,6 +76,8 @@ export function Editor({ note, onUpdate, onDelete }: Props) {
   function handleFormat(cmd: string) {
     if (!bodyRef.current) return
     bodyRef.current.focus()
+
+    // make sure there's a selection to work with
     const sel = window.getSelection()
     if (!sel || sel.rangeCount === 0) {
       const range = document.createRange()
@@ -78,13 +86,10 @@ export function Editor({ note, onUpdate, onDelete }: Props) {
       sel?.removeAllRanges()
       sel?.addRange(range)
     }
-    document.execCommand(cmd, false)
-    updateFormatState()
-    handleBodyInput()
-  }
 
-  function handleKeyUp() {
-    updateFormatState()
+    document.execCommand(cmd, false)
+    checkFormatState()
+    handleBodyInput()
   }
 
   if (!note) {
@@ -114,6 +119,8 @@ export function Editor({ note, onUpdate, onDelete }: Props) {
     )
   }
 
+  const wordCount = countWords(note.body.replace(/<[^>]*>/g, ' '))
+
   return (
     <div className={styles.editorArea}>
       <Toolbar
@@ -121,7 +128,7 @@ export function Editor({ note, onUpdate, onDelete }: Props) {
         isItalic={isItalic}
         isUnderline={isUnderline}
         isStrike={isStrike}
-        wordCount={countWords(note.body.replace(/<[^>]*>/g, ' '))}
+        wordCount={wordCount}
         onFormat={handleFormat}
         onDelete={() => onDelete(note.id)}
         hasNote={true}
@@ -134,14 +141,14 @@ export function Editor({ note, onUpdate, onDelete }: Props) {
           className={styles.titleInput}
           placeholder="Untitled note"
           value={note.title}
-          onChange={e => handleUpdate({ title: e.target.value })}
+          onChange={e => handleTitleChange(e.target.value)}
         />
 
         <div className={styles.metaRow}>
           <span className={styles.metaDate}>{formatFullDate(note.date)}</span>
           <div className={styles.pills}>
             {note.tags.map(tag => (
-              <span key={tag} className={`${styles.pill} ${TAG_PILL_CLASS[tag]}`}>
+              <span key={tag} className={`${styles.pill} ${tagStyles[tag]}`}>
                 {tag}
               </span>
             ))}
@@ -154,8 +161,8 @@ export function Editor({ note, onUpdate, onDelete }: Props) {
           contentEditable
           suppressContentEditableWarning
           onInput={handleBodyInput}
-          onKeyUp={handleKeyUp}
-          onMouseUp={handleKeyUp}
+          onKeyUp={checkFormatState}
+          onMouseUp={checkFormatState}
           data-placeholder="Start writing..."
         />
       </div>
@@ -176,36 +183,22 @@ interface ToolbarProps {
 }
 
 function Toolbar({ isBold, isItalic, isUnderline, isStrike, wordCount, hasNote, saved, onFormat, onDelete }: ToolbarProps) {
+  const btn = (label: React.ReactNode, cmd: string, active: boolean, title: string) => (
+    <button
+      className={`${styles.toolbarBtn} ${active ? styles.toolbarBtnActive : ''}`}
+      onMouseDown={e => { e.preventDefault(); onFormat(cmd) }}
+      title={title}
+    >
+      {label}
+    </button>
+  )
+
   return (
     <div className={styles.toolbar}>
-      <button
-        className={`${styles.toolbarBtn} ${isBold ? styles.toolbarBtnActive : ''}`}
-        onMouseDown={e => { e.preventDefault(); onFormat('bold') }}
-        title="Bold"
-      >
-        <b>B</b>
-      </button>
-      <button
-        className={`${styles.toolbarBtn} ${isItalic ? styles.toolbarBtnActive : ''}`}
-        onMouseDown={e => { e.preventDefault(); onFormat('italic') }}
-        title="Italic"
-      >
-        <i>I</i>
-      </button>
-      <button
-        className={`${styles.toolbarBtn} ${isUnderline ? styles.toolbarBtnActive : ''}`}
-        onMouseDown={e => { e.preventDefault(); onFormat('underline') }}
-        title="Underline"
-      >
-        <u>U</u>
-      </button>
-      <button
-        className={`${styles.toolbarBtn} ${isStrike ? styles.toolbarBtnActive : ''}`}
-        onMouseDown={e => { e.preventDefault(); onFormat('strikeThrough') }}
-        title="Strikethrough"
-      >
-        <s>S</s>
-      </button>
+      {btn(<b>B</b>, 'bold', isBold, 'Bold')}
+      {btn(<i>I</i>, 'italic', isItalic, 'Italic')}
+      {btn(<u>U</u>, 'underline', isUnderline, 'Underline')}
+      {btn(<s>S</s>, 'strikeThrough', isStrike, 'Strikethrough')}
       <div className={styles.toolbarSep} />
       <button
         className={styles.toolbarBtn}
@@ -214,6 +207,7 @@ function Toolbar({ isBold, isItalic, isUnderline, isStrike, wordCount, hasNote, 
       >
         ✕
       </button>
+
       <div className={styles.toolbarRight}>
         {saved && (
           <span className={styles.saveIndicator}>
