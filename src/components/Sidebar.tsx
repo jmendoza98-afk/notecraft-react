@@ -3,38 +3,29 @@ import { NoteList } from './NoteList'
 import { useNotes } from '../hooks/useNotes'
 import styles from './Sidebar.module.css'
 
-const ALL_TAGS: (Tag | 'all')[] = ['all', 'work', 'personal', 'ideas', 'design']
+const TAGS: (Tag | 'all')[] = ['all', 'work', 'personal', 'ideas', 'design']
 
-type Props = Pick<
-  ReturnType<typeof useNotes>,
-  'filteredNotes' | 'activeId' | 'filterTag' | 'searchQuery' |
-  'setActiveId' | 'setFilterTag' | 'setSearchQuery' | 'createNote'
-> & {
+type Props = {
+  filteredNotes: ReturnType<typeof useNotes>['filteredNotes']
+  activeId: ReturnType<typeof useNotes>['activeId']
+  filterTag: ReturnType<typeof useNotes>['filterTag']
+  searchQuery: ReturnType<typeof useNotes>['searchQuery']
+  setActiveId: ReturnType<typeof useNotes>['setActiveId']
+  setFilterTag: ReturnType<typeof useNotes>['setFilterTag']
+  setSearchQuery: ReturnType<typeof useNotes>['setSearchQuery']
+  createNote: ReturnType<typeof useNotes>['createNote']
   theme: string
   onToggleTheme: () => void
 }
-
-export function Sidebar({
-  filteredNotes,
-  activeId,
-  filterTag,
-  searchQuery,
-  setActiveId,
-  setFilterTag,
-  setSearchQuery,
-  createNote,
-  theme,
-  onToggleTheme,
-}: Props) {
+export function Sidebar({ filteredNotes, activeId, filterTag, searchQuery, setActiveId, setFilterTag, setSearchQuery, createNote, theme, onToggleTheme }: Props) {
   return (
     <aside className={styles.sidebar}>
+
       <div className={styles.header}>
-      <div className={styles.logo}>
-        note<span>craft</span>
-      </div>
-      <button className={styles.themeBtn} onClick={onToggleTheme} title="Toggle theme">
-         {theme === 'dark' ? '☀️' : '🌙'}
-      </button>
+        <div className={styles.logo}>note<span>craft</span></div>
+        <button className={styles.themeBtn} onClick={onToggleTheme}>
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
       </div>
 
       <button className={styles.newBtn} onClick={createNote}>
@@ -58,7 +49,7 @@ export function Sidebar({
       <div className={styles.tagSection}>
         <span className={styles.tagLabel}>Filter</span>
         <div className={styles.tags}>
-          {ALL_TAGS.map(tag => (
+          {TAGS.map(tag => (
             <button
               key={tag}
               className={`${styles.tag} ${filterTag === tag ? styles.active : ''}`}
@@ -70,11 +61,8 @@ export function Sidebar({
         </div>
       </div>
 
-      <NoteList
-        notes={filteredNotes}
-        activeId={activeId}
-        onSelect={setActiveId}
-      />
+      <NoteList notes={filteredNotes} activeId={activeId} onSelect={setActiveId} />
+
     </aside>
   )
 }
